@@ -487,12 +487,27 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   align-items: flex-end;
   background: var(--bg-strip);
-  padding: 5px 6px 0;
+  padding: 5px 0 0;
+  min-height: 37px;
+}
+.tabs-scroll {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
   gap: 2px;
   overflow-x: auto;
   scrollbar-width: none;
+  padding: 0 6px;
 }
-.tabs::-webkit-scrollbar { display: none; }
+.tabs-scroll::-webkit-scrollbar { display: none; }
+.tabs-actions {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 37px;
+  padding: 0 6px 0 4px;
+}
 
 .tab {
   display: flex;
@@ -650,6 +665,76 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   position: relative;
 }
+
+/* ---- 编辑器组（主组 + 预览组并排，同 VS Code 多分组布局） ---- */
+.editor-groups { flex: 1; display: flex; gap: 4px; min-height: 0; }
+.editor-group {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+.editor-group.hidden { display: none; }
+.preview-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 24px 40px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-faint) transparent;
+}
+.preview-body h1 {
+  font-size: 19px;
+  color: var(--text-strong);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  margin: 6px 0 14px;
+}
+.preview-body h2 {
+  font-size: 15.5px;
+  color: var(--text-strong);
+  margin: 18px 0 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+.preview-body p { margin: 8px 0; line-height: 1.65; }
+.preview-body ul { margin: 8px 0; padding-left: 22px; }
+.preview-body li { margin: 4px 0; line-height: 1.6; }
+.preview-body a { color: var(--syn-link); text-decoration: none; }
+.preview-body a:hover { text-decoration: underline; }
+.preview-body code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: var(--bg-hover);
+  border-radius: 4px;
+  padding: 2px 6px;
+  color: var(--syn-str);
+}
+.preview-body strong { color: var(--text-strong); }
+.preview-body blockquote {
+  margin: 10px 0;
+  padding: 4px 14px;
+  border-left: 3px solid var(--syn-cmt);
+  color: var(--text-dim);
+}
+
+/* tab 栏右侧的预览开关按钮 */
+.tabs-actions { margin-left: auto; display: flex; align-items: center; padding-right: 6px; flex: none; }
+.tab-action {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  color: var(--text-dim);
+}
+.tab-action:hover { background: var(--bg-hover); color: var(--text); }
+.tab-action.active { color: var(--syn-link); }
+.tab-action svg { width: 16px; height: 16px; }
 .minimap {
   position: absolute;
   top: 0;

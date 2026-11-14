@@ -83,6 +83,9 @@ const I18N = {
     themeSwitched: "Theme switched ✅",
     sudo: "visitor is not in the sudoers file. This incident will be reported. 😏",
     cmdNotFound: (c) => `bash: ${esc(c)}: command not found (try <b>help</b>)`,
+    previewTitle: "Preview",
+    openPreview: "Open Preview to the Side",
+    closePreview: "Close Preview",
     qoPlaceholder: "Search files by name (append : to go to line, append @ to go to symbol)",
     qoGoFile: "Go to File",
     qoRunCommands: "Show and Run Commands",
@@ -160,6 +163,9 @@ const I18N = {
     themeSwitched: "主题已切换 ✅",
     sudo: "visitor 不在 sudoers 文件中。此事件将被报告。😏",
     cmdNotFound: (c) => `bash: ${esc(c)}: command not found（试试 <b>help</b>）`,
+    previewTitle: "预览",
+    openPreview: "打开侧边预览",
+    closePreview: "关闭预览",
     qoPlaceholder: "按名称搜索文件（追加：转到行，追加 @ 转到符号）",
     qoGoFile: "转到文件",
     qoRunCommands: "显示并运行命令",
@@ -463,7 +469,8 @@ function highlightLine(line, lang) {
 
 const $ = (id) => document.getElementById(id);
 const treeEl = $("file-tree");
-const tabsEl = $("tabs");
+const tabsScrollEl = $("tabs-scroll");
+const tabsActionsEl = $("tabs-actions");
 const editorEl = $("editor");
 const minimapEl = $("minimap");
 const breadcrumbEl = $("breadcrumb");
@@ -472,6 +479,8 @@ let openTabs = ["README.md", "about.ts"];
 let activeFile = "about.ts";
 let folderOpen = true;
 let treeRootOpen = true;
+let mdPreviewOpen = false;
+const OPEN_PREVIEW_ICON = `<svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.5 1H4.5C3.122 1 2 2.122 2 3.5V6.276C2.319 6.162 2.653 6.089 3 6.05V3.499C3 2.672 3.673 1.999 4.5 1.999H8.5V13.385L9.557 14.442C9.714 14.591 9.831 14.786 9.907 14.999H13.5C14.878 14.999 16 13.877 16 12.499V3.5C16 2.122 14.878 1 13.5 1ZM15 12.5C15 13.327 14.327 14 13.5 14H9.5V2H13.5C14.327 2 15 2.673 15 3.5V12.5ZM6.29 12.59C6.74 12.01 7 11.28 7 10.5C7 8.57 5.43 7 3.5 7C1.57 7 0 8.57 0 10.5C0 12.43 1.57 14 3.5 14C4.28 14 5.01 13.74 5.59 13.29L8.15 15.85C8.24 15.95 8.37 16 8.5 16C8.63 16 8.76 15.95 8.85 15.85C9.05 15.66 9.05 15.34 8.85 15.15L6.29 12.59ZM5.5 12C5.36 12.19 5.19 12.36 5 12.5C4.59 12.81 4.06 13 3.5 13C2.12 13 1 11.88 1 10.5C1 9.12 2.12 8 3.5 8C4.88 8 6 9.12 6 10.5C6 11.06 5.81 11.59 5.5 12Z"/></svg>`;
 
 function basename(p) {
   return p.split("/").pop();
@@ -545,7 +554,7 @@ function treeItemHtml(path, indent) {
 }
 
 function renderTabs() {
-  tabsEl.innerHTML = openTabs
+  tabsScrollEl.innerHTML = openTabs
     .map((p) => {
       const active = p === activeFile ? " active" : "";
       return `<div class="tab${active}" data-file="${p}">
@@ -554,17 +563,39 @@ function renderTabs() {
     })
     .join("");
 
-  tabsEl.querySelectorAll(".tab").forEach((el) => {
+  tabsScrollEl.querySelectorAll(".tab").forEach((el) => {
     el.addEventListener("click", (e) => {
       if (e.target.dataset.close) return; // 关闭按钮单独处理
       openFile(el.dataset.file);
     });
   });
-  tabsEl.querySelectorAll(".tab-close").forEach((el) => {
-    el.addEventListener("click", () => {
-      showToast(T().toastTabClose);
+  tabsScrollEl.querySelectorAll(".tab-close").forEach((el) => {
+    el.addEventListener("click", (e) => {
+      e.stopPropagation();
+      closeTab(el.dataset.close);
     });
   });
+
+  // 预览开关按钮（仅 md 文件时显示）
+  tabsActionsEl.innerHTML = activeFile.endsWith(".md")
+    ? `<button class="tab-action ${mdPreviewOpen ? "active" : ""}" id="md-preview-btn" title="${T().openPreview}">${OPEN_PREVIEW_ICON}</button>`
+    : "";
+  const previewBtn = tabsActionsEl.querySelector("#md-preview-btn");
+  if (previewBtn) previewBtn.addEventListener("click", toggleMdPreview);
+}
+
+/* 关闭标签页（同 VS Code：关闭激活标签后激活相邻标签） */
+function closeTab(path) {
+  const idx = openTabs.indexOf(path);
+  if (idx === -1) return;
+  openTabs.splice(idx, 1);
+  if (!openTabs.length) openTabs = ["README.md"];
+  if (activeFile === path || !openTabs.includes(activeFile)) {
+    activeFile = openTabs[Math.min(idx, openTabs.length - 1)];
+  }
+  renderTree();
+  renderTabs();
+  renderEditor();
 }
 
 function renderEditor() {
@@ -601,6 +632,7 @@ function renderEditor() {
 
   $("status-lang").textContent = LANG_LABEL[file.lang] || file.lang;
   $("cc-file").textContent = basename(activeFile);
+  updatePreviewPane();
 }
 
 /* ---- 小地图：真实微缩代码渲染（同 VS Code minimap），随编辑器滚动联动 ---- */
@@ -670,6 +702,55 @@ minimapEl.addEventListener("pointercancel", () => {
   mmDrag = null;
   minimapEl.classList.remove("dragging");
 });
+
+/* ---- Markdown 渲染 + 侧边分屏预览 ---- */
+
+function renderMarkdown(md) {
+  md = md.replace(/<!--[\s\S]*?-->/g, "");
+  const inline = (s) =>
+    esc(s)
+      .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+      .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+      .replace(/`([^`]+)`/g, "<code>$1</code>");
+  let html = "";
+  let inList = false;
+  for (const raw of md.split("\n")) {
+    const line = raw.trimEnd();
+    const h = line.match(/^(#{1,6})\s+(.*)$/);
+    const li = line.match(/^-\s+(.*)$/);
+    if (h) {
+      if (inList) { html += "</ul>"; inList = false; }
+      const lvl = Math.min(h[1].length, 3);
+      html += `<h${lvl}>${inline(h[2])}</h${lvl}>`;
+    } else if (li) {
+      if (!inList) { html += "<ul>"; inList = true; }
+      html += `<li>${inline(li[1])}</li>`;
+    } else {
+      if (inList) { html += "</ul>"; inList = false; }
+      if (!line.trim()) continue;
+      if (line.startsWith(">")) html += `<blockquote>${inline(line.replace(/^>\s?/, ""))}</blockquote>`;
+      else html += `<p>${inline(line)}</p>`;
+    }
+  }
+  if (inList) html += "</ul>";
+  return html;
+}
+
+function toggleMdPreview() {
+  mdPreviewOpen = !mdPreviewOpen;
+  renderTabs();
+  updatePreviewPane();
+}
+
+function updatePreviewPane() {
+  const group = $("group-preview");
+  const show = mdPreviewOpen && activeFile.endsWith(".md");
+  group.classList.toggle("hidden", !show);
+  if (!show) return;
+  $("preview-tab-label").textContent = `${T().previewTitle} ${basename(activeFile)}`;
+  $("preview-body").innerHTML = renderMarkdown(FILES[activeFile].content);
+  $("preview-body").scrollTop = 0;
+}
 
 function openFile(path) {
   if (!FILES[path]) return;
@@ -1064,6 +1145,7 @@ function applyLang(l, silent) {
   $("status-problems").title = m.noProblems;
   $("status-bell").title = m.notifications;
   $("terminal-hide").title = m.closeTerminal;
+  $("preview-close").title = m.closePreview;
   $("menu-lang-state").textContent = l === "zh" ? "中文" : "English";
 
   // 动态部分重建
@@ -1107,7 +1189,8 @@ $("btn-palette-hint").addEventListener("click", openPalette);
 $("act-terminal").addEventListener("click", toggleTerminal);
 $("terminal-hide").addEventListener("click", toggleTerminal);
 $("status-branch").addEventListener("click", () => showToast(T().toastBranch));
-$("toast-close").addEventListener("click", () => $("toast").classList.add("hidden"));
+  $("toast-close").addEventListener("click", () => $("toast").classList.add("hidden"));
+  $("preview-close").addEventListener("click", toggleMdPreview);
 
 /* ============ 6.5 访问人次（静态页用免费计数服务 Abacus） ============ */
 
