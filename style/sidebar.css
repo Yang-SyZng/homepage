@@ -1,0 +1,101 @@
+/* ---- 侧栏（独立圆角表面） ---- */
+.sidebar {
+  width: 236px;
+  flex: none;
+  background: var(--bg-sidebar);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  user-select: none;
+}
+.sidebar.closed { display: none; }
+
+/* ---- 文件树折叠动画（grid 0fr ↔ 1fr 高度过渡） ---- */
+.tree-children {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.24s ease, opacity 0.2s ease;
+}
+.tree-children.closed {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+.tree-children-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+.sidebar-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-strong);
+  padding: 12px 16px 8px;
+}
+.sidebar-section { flex: none; }
+.tree-root {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-strong);
+  padding: 5px 8px;
+  margin: 0 6px;
+  border-radius: var(--r-sm);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: default;
+}
+.tree-root .arrow { font-size: 9px; color: var(--text-dim); }
+
+.tree-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4.5px 8px 4.5px 14px;
+  margin: 0 6px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--text);
+  white-space: nowrap;
+  border-radius: var(--r-sm);
+}
+.tree-item:hover { background: var(--bg-hover); }
+.tree-item.active { background: var(--bg-selected); color: var(--text-strong); }
+.tree-item.indent { padding-left: 30px; }
+.tree-item .caret { font-size: 9px; color: var(--text-dim); width: 10px; flex: none; }
+
+/* 文件图标（彩色小方块字母） */
+.ficon {
+  width: 16px; height: 16px;
+  flex: none;
+  border-radius: 5px;
+  display: inline-grid;
+  place-items: center;
+  font-family: var(--font-mono);
+  font-size: 7.5px;
+  font-weight: 800;
+  color: #fff;
+}
+.ficon-ts   { background: #3178c6; }
+.ficon-json { background: #cbcb41; color: #3b3b1f; }
+.ficon-md   { background: #519aba; }
+.ficon-py   { background: #3572a5; }
+.ficon-folder { background: transparent; color: #dcb67a; font-size: 11px; }
+
+.outline { border-top: 1px solid var(--border); margin-top: 12px; padding-top: 8px; }
+.outline-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-strong);
+  padding: 0 16px 6px;
+}
+.outline-item {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-dim);
+  padding: 4px 16px 4px 30px;
+  margin: 0 6px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+}
+.outline-item:hover { background: var(--bg-hover); color: var(--text); }

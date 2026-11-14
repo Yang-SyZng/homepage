@@ -1,0 +1,144 @@
+/* ============================================================
+   yang-syzng · homepage —— VS Code Modern UI 风格主题（base）
+   参考 VS Code 1.133 "Modern UI" 刷新：圆角窗口、独立表面、
+   connected tabs（选中标签与编辑器连成一体）。
+   暗色 / 亮色两套变量，改色直接改下面的变量即可。
+   ============================================================ */
+
+:root {
+  --font-ui: -apple-system, "PingFang SC", "Segoe UI", "Microsoft YaHei", sans-serif;
+  --font-mono: "SF Mono", Menlo, Consolas, "JetBrains Mono", "Cascadia Code", monospace;
+
+  /* 圆角刻度 */
+  --r-sm: 6px;    /* 树行、按钮、tab */
+  --r-md: 10px;   /* 侧栏、编辑器、终端等表面 */
+  --r-lg: 14px;   /* 浮层：命令面板、通知 */
+}
+
+html[data-theme="dark"] {
+  --bg: #1f1f1f;                  /* 编辑器表面 */
+  --bg-frame: #1a1a1e;            /* 窗口框架 / 活动栏背后的底 */
+  --bg-strip: #242428;            /* 标签条底色 */
+  --bg-activity: #232327;         /* 活动栏表面 */
+  --bg-sidebar: #222226;          /* 侧栏表面 */
+  --bg-titlebar: transparent;     /* 标题栏直接用窗口框架色 */
+  --bg-tab-active: #1f1f1f;       /* 选中标签 = 编辑器底色（连体） */
+  --bg-input: #2a2a2f;
+  --bg-terminal: #1a1a1f;
+  --bg-hover: rgba(255, 255, 255, 0.065);
+  --bg-selected: #0a3d66;
+  --bg-line-active: rgba(255, 255, 255, 0.045);
+  --border: rgba(255, 255, 255, 0.09);
+  --text: #d4d4d4;
+  --text-strong: #e9e9e9;
+  --text-dim: #93939b;
+  --text-faint: #5d5d66;
+  --accent: #0078d4;
+  --accent-text: #ffffff;
+  --act-fg: rgba(255, 255, 255, 0.45);
+  --act-fg-active: #ffffff;
+  --act-hover: rgba(255, 255, 255, 0.085);
+  --act-active: rgba(255, 255, 255, 0.15);
+  --mm-slider: rgba(121, 121, 121, 0.28);
+  --sb-bg: #181818;
+  --sb-fg: #cccccc;
+  --sb-border: #2b2b2b;
+  --sb-hover: rgba(241, 241, 241, 0.2);
+  --sb-hover-fg: #ffffff;
+  --sb-remote-bg: #0078d4;
+  --sb-remote-fg: #ffffff;
+  --shadow-pop: 0 12px 40px rgba(0, 0, 0, 0.5);
+
+  /* 语法高亮 */
+  --syn-plain: #d4d4d4;
+  --syn-kw: #c586c0;
+  --syn-str: #ce9178;
+  --syn-cmt: #6a9955;
+  --syn-num: #b5cea8;
+  --syn-type: #4ec9b0;
+  --syn-fn: #dcdcaa;
+  --syn-key: #9cdcfe;
+  --syn-lit: #569cd6;
+  --syn-link: #3794ff;
+  --syn-head: #569cd6;
+}
+
+html[data-theme="light"] {
+  --bg: #ffffff;
+  --bg-frame: #e9e9ee;
+  --bg-strip: #ededf1;
+  --bg-activity: #e3e3e9;
+  --bg-sidebar: #f4f4f6;
+  --bg-titlebar: transparent;
+  --bg-tab-active: #ffffff;
+  --bg-input: #ffffff;
+  --bg-terminal: #f6f6f8;
+  --bg-hover: rgba(0, 0, 0, 0.055);
+  --bg-selected: #cfe3fb;
+  --bg-line-active: rgba(0, 120, 255, 0.055);
+  --border: rgba(0, 0, 0, 0.1);
+  --text: #24292f;
+  --text-strong: #17191d;
+  --text-dim: #6e7781;
+  --text-faint: #a0a8b0;
+  --accent: #005fb8;
+  --accent-text: #ffffff;
+  --act-fg: #5c5c66;
+  --act-fg-active: #17191d;
+  --act-hover: rgba(0, 0, 0, 0.07);
+  --act-active: rgba(0, 0, 0, 0.13);
+  --mm-slider: rgba(100, 100, 100, 0.22);
+  --sb-bg: #f8f8f8;
+  --sb-fg: #3b3b3b;
+  --sb-border: #e5e5e5;
+  --sb-hover: rgba(31, 31, 31, 0.07);
+  --sb-hover-fg: #000000;
+  --sb-remote-bg: #005fb8;
+  --sb-remote-fg: #ffffff;
+  --shadow-pop: 0 12px 36px rgba(28, 30, 40, 0.22);
+
+  --syn-plain: #24292e;
+  --syn-kw: #af00db;
+  --syn-str: #a31515;
+  --syn-cmt: #3f8018;
+  --syn-num: #098658;
+  --syn-type: #267f99;
+  --syn-fn: #795e26;
+  --syn-key: #0451a5;
+  --syn-lit: #0000ff;
+  --syn-link: #0066bf;
+  --syn-head: #0451a5;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  background: var(--bg-frame);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: background 0.25s, color 0.25s;
+}
+
+::selection { background: #264f78; color: #fff; }
+
+button { font-family: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+
+.hidden { display: none !important; }
+.dim { opacity: 0.6; }
+
+/* ============ 窗口外壳（满铺，无外边距） ============ */
+.window {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-frame);
+  overflow: hidden;
+}

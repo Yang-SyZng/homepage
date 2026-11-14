@@ -1,0 +1,103 @@
+/* ============ 工作台：独立圆角表面 ============ */
+.workbench {
+  flex: 1;
+  display: flex;
+  gap: 4px;
+  padding: 0 4px 4px;
+  min-height: 0;
+}
+
+/* ---- 活动栏（圆角胶囊列） ---- */
+.activitybar {
+  width: 48px;
+  flex: none;
+  background: var(--bg-activity);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 0;
+  gap: 2px;
+  position: relative;
+}
+.act-btn {
+  width: 44px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  color: var(--act-fg);
+  position: relative;
+  transition: color 0.15s;
+}
+/* 悬停 / 选中的胶囊：比按钮小一圈，选中比悬停深一档 */
+.act-btn::before {
+  content: "";
+  position: absolute;
+  inset: 4px 2px;
+  border-radius: 9px;
+  background: transparent;
+  transition: background 0.15s;
+}
+.act-btn:hover { color: var(--act-fg-active); }
+.act-btn:hover::before { background: var(--act-hover); }
+.act-btn.active { color: var(--act-fg-active); }
+.act-btn.active::before { background: var(--act-active); }
+.act-btn svg {
+  position: relative;
+  z-index: 1;
+  width: 24px;
+  height: 24px;
+  transform: scale(1.22); /* 图标字形放大，接近原版 codicon 的占比 */
+}
+.act-spacer { flex: 1; }
+
+/* ---- 顶部头像（点击跳转 GitHub 主页） ---- */
+.avatar-btn {
+  width: 44px;
+  height: 48px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  margin-bottom: 2px;
+}
+.avatar-btn img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.avatar-btn:hover img {
+  transform: scale(1.05);
+  box-shadow: 0 0 0 2px var(--act-hover), 0 0 0 3.5px var(--act-active);
+}
+
+/* ---- 设置弹出菜单（齿轮按钮上方） ---- */
+.settings-menu {
+  position: absolute;
+  left: calc(100% + 8px);
+  bottom: 6px;
+  z-index: 70;
+  width: 250px;
+  background: var(--bg-sidebar);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-pop);
+  padding: 5px;
+  animation: menu-in 0.15s ease;
+}
+@keyframes menu-in { from { opacity: 0; transform: translateY(4px); } }
+.settings-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text);
+  border-radius: 7px;
+  text-align: left;
+}
+.settings-item:hover { background: var(--bg-hover); color: var(--text-strong); }
+.settings-item .mi-state { margin-left: auto; font-size: 11px; color: var(--text-faint); }

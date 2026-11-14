@@ -1,0 +1,21 @@
+/* ============ 通知气泡 ============ */
+.toast {
+  position: fixed;
+  right: 16px;
+  bottom: 40px;
+  z-index: 90;
+  width: min(320px, calc(100vw - 44px));
+  background: var(--bg-sidebar);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-pop);
+  padding: 13px 15px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  animation: toast-in 0.3s ease;
+}
+@keyframes toast-in { from { opacity: 0; transform: translateY(10px); } }
+.toast-text { font-size: 12.5px; line-height: 1.6; flex: 1; }
+.toast-close { color: var(--text-dim); font-size: 12px; padding: 2px 4px; border-radius: 5px; }
+.toast-close:hover { background: var(--bg-hover); color: var(--text); }

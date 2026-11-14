@@ -1,0 +1,314 @@
+/* ---- 编辑器列（独立圆角表面，pill 式标签） ---- */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+
+.tabs {
+  flex: none;
+  display: flex;
+  align-items: flex-end;
+  background: var(--bg-strip);
+  padding: 5px 0 0;
+  min-height: 37px;
+}
+.tabs-scroll {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 0 6px;
+}
+.tabs-scroll::-webkit-scrollbar { display: none; }
+.tabs-actions {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 37px;
+  padding: 0 6px 0 4px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 8px 0 12px;
+  height: 30px;
+  font-size: 12.5px;
+  color: var(--text);
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  position: relative;
+  user-select: none;
+  border-radius: 8px 8px 0 0;
+  transition: background 0.12s;
+}
+.tab:hover { background: var(--bg-hover); }
+/* 连体选中态：底色与编辑器一致，只有顶部两个圆角，无描边无高亮线 */
+.tab.active {
+  background: var(--bg-tab-active);
+  color: var(--text-strong);
+}
+.tab .tab-close {
+  width: 17px; height: 17px;
+  display: grid;
+  place-items: center;
+  border-radius: 5px;
+  font-size: 11px;
+  color: var(--text-dim);
+  visibility: hidden;
+}
+.tab:hover .tab-close, .tab.active .tab-close { visibility: visible; }
+.tab .tab-close:hover { background: var(--bg-hover); color: var(--text); }
+
+.fico { width: 16px; height: 16px; flex: none; }
+
+/* Seti 字体（VS Code 原版文件图标字体） */
+@font-face {
+  font-family: "seti";
+  src: url("../seti.woff") format("woff");
+  font-display: block;
+}
+.fico-seti {
+  font-family: "seti";
+  font-size: 15px;
+  font-weight: normal;
+  line-height: 1;
+}
+.git-status {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  margin-left: -2px;
+}
+
+.breadcrumb {
+  flex: none;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 16px;
+  font-size: 12px;
+  color: var(--text-dim);
+  background: var(--bg);
+  user-select: none;
+}
+.breadcrumb .bc-file { color: var(--text-strong); }
+
+/* ---- 代码区 ---- */
+.editor-area {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  overflow-y: auto;
+  overflow-x: auto;
+  background: var(--bg);
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-faint) transparent;
+}
+.editor-area::-webkit-scrollbar { width: 11px; }
+.editor-area::-webkit-scrollbar-thumb {
+  background: var(--text-faint);
+  border-radius: 8px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+.editor-area::-webkit-scrollbar-thumb:hover { background-color: var(--text-dim); }
+
+.editor {
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  line-height: 1.7;
+  padding: 8px 0 40vh;
+  min-width: fit-content;
+}
+
+.code-line {
+  display: flex;
+  min-width: fit-content;
+  padding-right: 90px;
+  opacity: 0;
+  transform: translateY(4px);
+  animation: line-in 0.22s ease forwards;
+  animation-delay: var(--d, 0ms);
+  position: relative;
+}
+@keyframes line-in { to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .code-line { animation: none; opacity: 1; transform: none; }
+  .tree-children { transition: none; }
+}
+
+.code-line.active-line::after {
+  content: "";
+  position: absolute;
+  left: 4px; right: 86px; top: 0; bottom: 0;
+  background: var(--bg-line-active);
+  border-radius: var(--r-sm);
+  pointer-events: none;
+}
+.active-line .ln { color: var(--text); }
+
+.ln {
+  flex: none;
+  width: 52px;
+  padding-right: 20px;
+  text-align: right;
+  color: var(--text-faint);
+  user-select: none;
+}
+.lc { white-space: pre; }
+
+.cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1.15em;
+  vertical-align: text-bottom;
+  background: var(--text);
+  margin-left: 1px;
+  animation: blink 1.05s steps(1) infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* 语法 token */
+.tk-plain { color: var(--syn-plain); }
+.tk-kw    { color: var(--syn-kw); }
+.tk-str   { color: var(--syn-str); }
+.tk-cmt   { color: var(--syn-cmt); font-style: italic; }
+.tk-num   { color: var(--syn-num); }
+.tk-type  { color: var(--syn-type); }
+.tk-fn    { color: var(--syn-fn); }
+.tk-key   { color: var(--syn-key); }
+.tk-lit   { color: var(--syn-lit); }
+.tk-link  { color: var(--syn-link); text-decoration: underline; }
+.tk-head  { color: var(--syn-head); font-weight: 700; }
+.tk-bold  { color: var(--syn-plain); font-weight: 700; }
+.tk-dim   { color: var(--text-faint); }
+.tk-visitors { font-weight: 700; }
+
+/* ---- 小地图（真实微缩代码渲染，同 VS Code minimap） ---- */
+.editor-wrap {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  position: relative;
+}
+
+/* ---- 编辑器组（主组 + 预览组并排，同 VS Code 多分组布局） ---- */
+.editor-groups { flex: 1; display: flex; gap: 4px; min-height: 0; }
+.editor-group {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+.editor-group.hidden { display: none; }
+.preview-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 24px 40px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-faint) transparent;
+}
+.preview-body h1 {
+  font-size: 19px;
+  color: var(--text-strong);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  margin: 6px 0 14px;
+}
+.preview-body h2 {
+  font-size: 15.5px;
+  color: var(--text-strong);
+  margin: 18px 0 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+.preview-body p { margin: 8px 0; line-height: 1.65; }
+.preview-body ul { margin: 8px 0; padding-left: 22px; }
+.preview-body li { margin: 4px 0; line-height: 1.6; }
+.preview-body a { color: var(--syn-link); text-decoration: none; }
+.preview-body a:hover { text-decoration: underline; }
+.preview-body code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: var(--bg-hover);
+  border-radius: 4px;
+  padding: 2px 6px;
+  color: var(--syn-str);
+}
+.preview-body strong { color: var(--text-strong); }
+.preview-body blockquote {
+  margin: 10px 0;
+  padding: 4px 14px;
+  border-left: 3px solid var(--syn-cmt);
+  color: var(--text-dim);
+}
+
+/* tab 栏右侧的预览开关按钮 */
+.tabs-actions { margin-left: auto; display: flex; align-items: center; padding-right: 6px; flex: none; }
+.tab-action {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  color: var(--text-dim);
+}
+.tab-action:hover { background: var(--bg-hover); color: var(--text); }
+.tab-action.active { color: var(--syn-link); }
+.tab-action svg { width: 16px; height: 16px; }
+.minimap {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 64px;
+  bottom: 0;
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+  z-index: 2;
+}
+.mm-content {
+  position: absolute;
+  top: 6px;
+  left: 3px;
+  right: 2px;
+  font-family: var(--font-mono);
+  font-size: 3.2px;
+  line-height: 4.3px;
+  white-space: pre;
+  pointer-events: none;
+}
+.mm-line { color: var(--syn-plain); }
+.mm-slider {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: var(--mm-slider);
+  border-radius: 2px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.minimap:hover .mm-slider,
+.minimap.dragging .mm-slider { opacity: 1; }

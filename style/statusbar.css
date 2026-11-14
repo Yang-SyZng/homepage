@@ -1,0 +1,40 @@
+/* ============ 状态栏（配色对齐 Dark / Light Modern 主题源码） ============ */
+.statusbar {
+  flex: none;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--sb-bg);
+  border-top: 1px solid var(--sb-border);
+  color: var(--sb-fg);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+}
+.status-left, .status-right { display: flex; align-items: center; height: 100%; }
+.sb-icon { width: 14px; height: 14px; flex: none; }
+.status-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+  padding: 0 5px;
+  margin: 0 3px;
+  color: var(--sb-fg);
+  white-space: nowrap;
+}
+.status-left .status-item:first-child {
+  /* remote 指示器：独立背景色，贴住左边缘（同 remote-kind） */
+  margin-left: 0;
+  padding: 0 8px;
+  background: var(--sb-remote-bg);
+  color: var(--sb-remote-fg);
+}
+.status-left .status-item:first-child:hover { filter: brightness(1.15); }
+.status-right .status-item:last-child { margin-right: 0; padding-right: 8px; }
+button.status-item { cursor: pointer; }
+button.status-item:hover {
+  background: var(--sb-hover);
+  color: var(--sb-hover-fg);
+}
