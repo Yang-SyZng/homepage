@@ -17,37 +17,192 @@ const PROFILE = {
    换一个全局唯一的 namespace 即可独立从零计数 */
 const COUNTER_NS = "yang-syzng-homepage";
 
-const FILES = {
+/* ============ 1.5 界面文案中英双语 ============ */
+
+let lang = localStorage.getItem("hp-lang") || "en";
+const T = () => I18N[lang];
+
+const I18N = {
+  en: {
+    explorer: "Explorer",
+    outline: "Outline",
+    paletteBtn: "Palette",
+    palettePlaceholder: "Type a command or search…",
+    noMatch: "No matching commands",
+    navigate: "navigate",
+    run: "run",
+    close: "close",
+    termPlaceholder: "Type help for available commands…",
+    cmdAbout: "Open: about.ts (About me)",
+    cmdSkills: "Open: skills.json (Skills)",
+    cmdProjects: "Open: projects/ (Projects)",
+    cmdContact: "Open: contact.md (Contact)",
+    cmdReadme: "Open: README.md (Guide)",
+    cmdTerm: "Toggle terminal",
+    cmdSidebar: "Toggle sidebar",
+    cmdGithub: "Open GitHub profile ↗",
+    cmdTips: "Show usage tips",
+    tipsText: "Click files in the explorer to switch content. ⌘K / Ctrl+K opens the command palette, Ctrl + ` opens the terminal.",
+    toastWelcome: "👋 Welcome to my homepage!<br>Press <b>⌘K / Ctrl+K</b> for the command palette, or <b>Ctrl + `</b> for the terminal.",
+    toastTabClose: "Nice try — this tab can't be closed. It's a permanent resident 😜",
+    toastBranch: "Branch main is protected: this is a homepage, not a PR 🛡️",
+    toastLang: "🌐 Language switched to English",
+    actFiles: "Explorer",
+    actSearch: "Search / Command Palette",
+    actTerminal: "Terminal",
+    actSettings: "Settings",
+    openPalette: "Open command palette",
+    toggleTheme: "Toggle theme",
+    branch: "Branch",
+    remote: "Remote",
+    noProblems: "0 problems",
+    notifications: "Notifications",
+    closeTerminal: "Close Terminal",
+    tabClose: "Close",
+    themeItem: "Toggle Light / Dark Theme",
+    termBanner: "yang-syzng@homepage — bash (cosplay edition)",
+    termBannerHint: "Type <b>help</b> for available commands. Try <b>neofetch</b> for a surprise.",
+    helpText: [
+      "Available commands:",
+      "  help        show this help",
+      "  whoami      who am I",
+      "  ls          list all files",
+      "  cat <file>  print a file (e.g. cat about.ts)",
+      "  neofetch    system info (pretend)",
+      "  github      open the GitHub profile",
+      "  theme       toggle light / dark theme",
+      "  echo / date / clear / sudo also work",
+    ],
+    whoami: "visitor — a friendly passerby of this homepage. Welcome 👋",
+    catUsage: "usage: cat <file> (run ls first)",
+    catMissing: (f) => `cat: ${esc(f)}: No such file`,
+    shellValue: "cosplay bash 5.0",
+    mood: "tinkering 🔧",
+    themeNow: (v) => `VS Code (currently ${v})`,
+    githubOpening: "Opening the GitHub profile…",
+    themeSwitched: "Theme switched ✅",
+    sudo: "visitor is not in the sudoers file. This incident will be reported. 😏",
+    cmdNotFound: (c) => `bash: ${esc(c)}: command not found (try <b>help</b>)`,
+    qoPlaceholder: "Search files by name (append : to go to line, append @ to go to symbol)",
+    qoGoFile: "Go to File",
+    qoRunCommands: "Show and Run Commands",
+    qoSearchText: "Search Text",
+    qoChat: "Open Quick Chat",
+    qoSymbol: "Go to Symbol in Editor",
+    qoDebug: "Start Debugging",
+    qoTask: "Run Task",
+    qoMore: "More",
+    qoRecent: "Recently opened",
+    qoToastSearch: "🔍 Text search is decorative here — try Ctrl/Cmd + K",
+    qoToastChat: "💬 No chat included — this homepage runs on good vibes",
+    qoToastSymbol: "🔎 The symbols are shy today",
+    qoToastDebug: "🐛 Nothing to debug — it just works",
+    qoToastTask: "📋 All tasks done. Go take a break",
+    qoToastMore: "🚪 You found the secret door",
+  },
+  zh: {
+    explorer: "资源管理器",
+    outline: "大纲",
+    paletteBtn: "命令面板",
+    palettePlaceholder: "输入命令或搜索…",
+    noMatch: "没有匹配的命令",
+    navigate: "选择",
+    run: "执行",
+    close: "关闭",
+    termPlaceholder: "输入 help 查看可用命令…",
+    cmdAbout: "打开：about.ts（关于我）",
+    cmdSkills: "打开：skills.json（技能点）",
+    cmdProjects: "打开：projects/（项目）",
+    cmdContact: "打开：contact.md（联系方式）",
+    cmdReadme: "打开：README.md（使用说明）",
+    cmdTerm: "打开 / 关闭终端",
+    cmdSidebar: "显示 / 隐藏侧边栏",
+    cmdGithub: "打开 GitHub 主页 ↗",
+    cmdTips: "查看使用提示",
+    tipsText: "点击左侧文件树切换内容；⌘K / Ctrl+K 打开命令面板；Ctrl + ` 打开终端。",
+    toastWelcome: "👋 欢迎来到我的主页！<br>按 <b>⌘K / Ctrl+K</b> 唤起命令面板，或按 <b>Ctrl + `</b> 打开终端。",
+    toastTabClose: "这个页面关不掉哦，它已经是本页面的精神股东了 😜",
+    toastBranch: "分支 main 受到保护：这是主页，不是 PR 🛡️",
+    toastLang: "🌐 语言已切换为中文",
+    actFiles: "资源管理器",
+    actSearch: "搜索 / 命令面板",
+    actTerminal: "终端",
+    actSettings: "设置",
+    openPalette: "打开命令面板",
+    toggleTheme: "切换主题",
+    branch: "分支",
+    remote: "远程",
+    noProblems: "0 个问题",
+    notifications: "通知",
+    closeTerminal: "关闭终端",
+    tabClose: "关闭",
+    themeItem: "切换亮色 / 暗色主题",
+    termBanner: "yang-syzng@homepage — bash（伪装版）",
+    termBannerHint: "输入 <b>help</b> 查看可用命令，输入 <b>neofetch</b> 惊喜一下",
+    helpText: [
+      "可用命令：",
+      "  help        显示本帮助",
+      "  whoami      我是谁",
+      "  ls          列出所有文件",
+      "  cat <file>  查看某个文件（如 cat about.ts）",
+      "  neofetch    系统信息（假装的）",
+      "  github      打开 GitHub 主页",
+      "  theme       切换亮色 / 暗色主题",
+      "  echo/date/clear/sudo 都能用",
+    ],
+    whoami: "visitor —— 一位恰好路过 homepage 的朋友。欢迎 👋",
+    catUsage: "用法：cat <file>（先 ls 看看有什么）",
+    catMissing: (f) => `cat: ${esc(f)}: 没有那个文件`,
+    shellValue: "伪装版 bash 5.0",
+    mood: "折腾中 🔧",
+    themeNow: (v) => `VS Code（目前是${v}）`,
+    githubOpening: "正在打开 GitHub 主页…",
+    themeSwitched: "主题已切换 ✅",
+    sudo: "visitor 不在 sudoers 文件中。此事件将被报告。😏",
+    cmdNotFound: (c) => `bash: ${esc(c)}: command not found（试试 <b>help</b>）`,
+    qoPlaceholder: "按名称搜索文件（追加：转到行，追加 @ 转到符号）",
+    qoGoFile: "转到文件",
+    qoRunCommands: "显示并运行命令",
+    qoSearchText: "搜索文本",
+    qoChat: "打开快速聊天",
+    qoSymbol: "转到编辑器中的符号",
+    qoDebug: "开始调试",
+    qoTask: "运行任务",
+    qoMore: "更多",
+    qoRecent: "最近打开",
+    qoToastSearch: "🔍 文本搜索是装饰性的，试试 Ctrl/Cmd + K",
+    qoToastChat: "💬 没有接入聊天，本主页靠意念运行",
+    qoToastSymbol: "🔎 符号们今天都很害羞",
+    qoToastDebug: "🐛 无 bug 可调，请放心食用",
+    qoToastTask: "📋 任务清单已清空，去晒晒太阳吧",
+    qoToastMore: "🚪 你发现了秘密之门",
+  },
+};
+
+const FILES_EN = {
   "README.md": {
     lang: "md",
     content: `# yang-syzng · homepage
 
-A personal homepage disguised as VS Code (Modern UI rounded style),
-hosted on GitHub Pages.
+A personal homepage
 
 ## Tips
 
 - Click files in the explorer or the tabs above to switch content
 - Press Ctrl/Cmd + K for the command palette
 - Press Ctrl + \` to open the terminal, type help for surprises
-- The visitor count in about.ts is real (powered by Abacus)
-- The bottom button in the activity bar toggles light / dark theme
-
-## Customize
-
-All content lives in the FILES object at the top of app.js — plain text
-only, no frontend knowledge needed. Push and it redeploys automatically.`,
+- The visitor count in about.ts is real
+- The bottom button in the activity bar toggles light / dark theme`,
   },
 
   "about.ts": {
     lang: "ts",
     content: `// yang-syzng · Developer
-// The page you are looking at is a website disguised as VS Code.
 
 const me = {
   name: "yang-syzng",
   role: "Developer",
-  location: "China",
+  location: "Hong Kong",
   interests: ["coding", "open source", "tinkering"],
   motto: "Talk is cheap. Show me the code.",
 };
@@ -123,6 +278,109 @@ project = {
 > If you find this homepage fun, a star on GitHub is appreciated ✨`,
   },
 };
+
+/* 中文版内容：切换语言时使用。编辑内容请两个版本一起改 */
+const FILES_ZH = {
+  "README.md": {
+    lang: "md",
+    content: `# yang-syzng · 主页
+
+一个个人主页
+
+## 玩法
+
+- 点击左侧文件树或顶部标签页切换内容
+- 按 Ctrl/Cmd + K 唤起命令面板
+- 按 Ctrl + \` 打开终端，输入 help 有惊喜
+- about.ts 里的访客计数是真实的
+- 活动栏最下面的按钮可以切换亮色 / 暗色主题`,
+  },
+
+  "about.ts": {
+    lang: "ts",
+    content: `// yang-syzng · 开发者
+
+const me = {
+  name: "yang-syzng",
+  role: "开发者",
+  location: "Hong Kong",
+  interests: ["编程", "开源", "折腾"],
+  motto: "Talk is cheap. Show me the code.",
+};
+
+function greeting(visitor: string): string {
+  return \`Hi \${visitor}, 你是第 __VISITORS__ 位访客, 欢迎来到我的主页!\`;
+}
+
+console.log(greeting("朋友"));
+
+// TODO: 把上面的占位信息换成你自己的
+export default me;`,
+  },
+
+  "skills.json": {
+    lang: "json",
+    content: `{
+  "languages": ["TypeScript", "Python", "Go", "Rust"],
+  "frontend": ["React", "Vue", "Astro", "TailwindCSS"],
+  "backend": ["Node.js", "FastAPI", "PostgreSQL"],
+  "tools": ["Git", "Docker", "Linux", "Vite"],
+  "learning": ["Rust", "AI Engineering"],
+  "funFacts": [
+    "这个主页是一只伪装成 VS Code 的网页",
+    "按 Ctrl/Cmd + K 可以唤起命令面板",
+    "在终端里输入 help 能看到隐藏命令"
+  ]
+}`,
+  },
+
+  "projects/vscode-homepage.ts": {
+    lang: "ts",
+    content: `export const project = {
+  name: "vscode-homepage",
+  desc: "你正在看的这个主页 —— 一个伪装成 VS Code 的纯静态网页",
+  stack: ["HTML", "CSS", "JavaScript"],
+  link: "https://github.com/yang-syzng/homepage",
+  highlight: "按 Ctrl/Cmd + K 试试命令面板",
+};`,
+  },
+
+  "projects/todo-your-project.ts": {
+    lang: "ts",
+    content: `// TODO: 把这个文件换成你自己的项目
+export const project = {
+  name: "your-awesome-project",
+  desc: "一句话说清这个项目做了什么、解决了什么问题",
+  stack: ["TypeScript", "React", "Node.js"],
+  link: "https://github.com/yang-syzng",
+  status: "求 star ✨",
+};`,
+  },
+
+  "projects/side-quest.py": {
+    lang: "py",
+    content: `# TODO: 把这个文件换成你自己的小项目
+project = {
+    "name": "side-quest",
+    "desc": "工作之外写的小玩具，可以是一个脚本或实验",
+    "stack": ["Python"],
+    "link": "https://github.com/yang-syzng",
+}`,
+  },
+
+  "contact.md": {
+    lang: "md",
+    content: `# 联系方式
+
+- GitHub: [@yang-syzng](https://github.com/yang-syzng)
+- Email: [me@example.com](mailto:me@example.com) <!-- TODO: 换成你的邮箱 -->
+- Blog: 敬请期待…
+
+> 觉得这个主页有趣的话，欢迎去 GitHub 点个 star ✨`,
+  },
+};
+
+let FILES = FILES_EN;
 
 /* 侧边栏文件树的展示顺序（文件夹里放子文件） */
 const TREE = [
@@ -213,6 +471,7 @@ const breadcrumbEl = $("breadcrumb");
 let openTabs = ["README.md", "about.ts"];
 let activeFile = "about.ts";
 let folderOpen = true;
+let treeRootOpen = true;
 
 function basename(p) {
   return p.split("/").pop();
@@ -243,28 +502,38 @@ function fileIcon(path) {
 }
 
 function renderTree() {
-  let html = '<div class="tree-root"><span class="arrow">▾</span> HOMEPAGE</div>';
+  const rootArrow = treeRootOpen ? "▾" : "▸";
+  let html = `<div class="tree-root"><span class="arrow">${rootArrow}</span> HOMEPAGE</div>`;
+  html += `<div class="tree-children ${treeRootOpen ? "" : "closed"}"><div class="tree-children-inner">`;
   for (const node of TREE) {
     if (node.file) {
       html += treeItemHtml(node.file, false);
     } else {
       const arrow = folderOpen ? "▾" : "▸";
       html += `<div class="tree-item folder" data-folder="${node.folder}">
-        <span class="caret">${arrow}</span><span class="ficon ficon-folder">▸</span> ${node.folder}</div>`;
-      if (folderOpen) {
-        for (const child of node.children) html += treeItemHtml(child, true);
-      }
+        <span class="caret">${arrow}</span> ${node.folder}</div>`;
+      html += `<div class="tree-children subtree ${folderOpen ? "" : "closed"}"><div class="tree-children-inner">`;
+      for (const child of node.children) html += treeItemHtml(child, true);
+      html += `</div></div>`;
     }
   }
+  html += `</div></div>`;
   treeEl.innerHTML = html;
 
+  // 折叠/展开只切换 class（保留 DOM 才有过渡动画）
+  treeEl.querySelector(".tree-root").addEventListener("click", () => {
+    treeRootOpen = !treeRootOpen;
+    treeEl.querySelector(".tree-children").classList.toggle("closed", !treeRootOpen);
+    treeEl.querySelector(".tree-root .arrow").textContent = treeRootOpen ? "▾" : "▸";
+  });
   treeEl.querySelectorAll(".tree-item[data-file]").forEach((el) => {
     el.addEventListener("click", () => openFile(el.dataset.file));
   });
   treeEl.querySelectorAll(".tree-item.folder").forEach((el) => {
     el.addEventListener("click", () => {
       folderOpen = !folderOpen;
-      renderTree();
+      treeEl.querySelector(".tree-children.subtree").classList.toggle("closed", !folderOpen);
+      el.querySelector(".caret").textContent = folderOpen ? "▾" : "▸";
     });
   });
 }
@@ -281,7 +550,7 @@ function renderTabs() {
       const active = p === activeFile ? " active" : "";
       return `<div class="tab${active}" data-file="${p}">
         ${fileIcon(p)} ${basename(p)} ${gitBadge(p)}
-        <span class="tab-close" data-close="${p}" title="Close">✕</span></div>`;
+        <span class="tab-close" data-close="${p}" title="${T().tabClose}">✕</span></div>`;
     })
     .join("");
 
@@ -293,7 +562,7 @@ function renderTabs() {
   });
   tabsEl.querySelectorAll(".tab-close").forEach((el) => {
     el.addEventListener("click", () => {
-      showToast("Nice try — this tab can't be closed. It's a permanent resident 😜");
+      showToast(T().toastTabClose);
     });
   });
 }
@@ -331,24 +600,76 @@ function renderEditor() {
       .join("");
 
   $("status-lang").textContent = LANG_LABEL[file.lang] || file.lang;
-  $("titlebar-file").textContent = basename(activeFile);
+  $("cc-file").textContent = basename(activeFile);
+}
+
+/* ---- 小地图：真实微缩代码渲染（同 VS Code minimap），随编辑器滚动联动 ---- */
+
+const editorAreaEl = editorEl.parentElement;
+
+function updateMinimapSlider() {
+  const slider = document.getElementById("mm-slider");
+  const content = minimapEl.querySelector(".mm-content");
+  if (!slider || !content) return;
+  const viewRatio = Math.min(
+    1,
+    editorAreaEl.clientHeight / Math.max(editorAreaEl.scrollHeight, 1),
+  );
+  const sliderH = Math.max(viewRatio * content.offsetHeight, 24);
+  const scrollRatio =
+    editorAreaEl.scrollTop / Math.max(editorAreaEl.scrollHeight - editorAreaEl.clientHeight, 1);
+  slider.style.height = sliderH + "px";
+  slider.style.top = scrollRatio * Math.max(content.offsetHeight - sliderH, 0) + "px";
 }
 
 function renderMinimap(lines) {
-  minimapEl.innerHTML = lines
-    .slice(0, 120)
-    .map((line) => {
-      const t = line.trim();
-      if (!t) return '<div class="minimap-line" style="opacity:.12"></div>';
-      let cls = "";
-      if (/^(\/\/|#|<!--|>)/.test(t)) cls = "cmt";
-      else if (/^["'`]/.test(t)) cls = "str";
-      else if (/^(const|let|export|function|def|import)/.test(t)) cls = "kw";
-      const w = Math.min(4 + t.length * 0.62, 52);
-      return `<div class="minimap-line ${cls} ${t.length > 30 ? "long" : ""}" style="width:${w}px"></div>`;
-    })
+  const file = FILES[activeFile];
+  const body = lines
+    .map((line) => `<div class="mm-line">${highlightLine(line, file.lang) || "&nbsp;"}</div>`)
     .join("");
+  minimapEl.innerHTML =
+    `<div class="mm-content">${body}</div><div class="mm-slider" id="mm-slider"></div>`;
+  updateMinimapSlider();
 }
+
+editorAreaEl.addEventListener("scroll", updateMinimapSlider);
+window.addEventListener("resize", updateMinimapSlider);
+
+/* 点击跳转 + 拖动滑块（同 VS Code：点空白滑块居中，按住可拖） */
+let mmDrag = null;
+minimapEl.addEventListener("pointerdown", (e) => {
+  const slider = document.getElementById("mm-slider");
+  const content = minimapEl.querySelector(".mm-content");
+  if (!slider || !content) return;
+  const rect = minimapEl.getBoundingClientRect();
+  const range = Math.max(content.offsetHeight - slider.offsetHeight, 0);
+  const scrollable = Math.max(editorAreaEl.scrollHeight - editorAreaEl.clientHeight, 0);
+  if (range <= 0 || scrollable <= 0) return;
+
+  let top = Math.min(Math.max(parseFloat(slider.style.top) || 0, 0), range);
+  if (!e.target.closest("#mm-slider")) {
+    // 点在滑块外：滑块中心对准点击位置
+    top = Math.min(Math.max(e.clientY - rect.top - slider.offsetHeight / 2, 0), range);
+    editorAreaEl.scrollTop = (top / range) * scrollable;
+  }
+  mmDrag = { startY: e.clientY, startTop: top, range, scrollable };
+  minimapEl.classList.add("dragging");
+  minimapEl.setPointerCapture(e.pointerId);
+  e.preventDefault();
+});
+minimapEl.addEventListener("pointermove", (e) => {
+  if (!mmDrag) return;
+  const top = Math.min(Math.max(mmDrag.startTop + (e.clientY - mmDrag.startY), 0), mmDrag.range);
+  editorAreaEl.scrollTop = (top / mmDrag.range) * mmDrag.scrollable;
+});
+minimapEl.addEventListener("pointerup", () => {
+  mmDrag = null;
+  minimapEl.classList.remove("dragging");
+});
+minimapEl.addEventListener("pointercancel", () => {
+  mmDrag = null;
+  minimapEl.classList.remove("dragging");
+});
 
 function openFile(path) {
   if (!FILES[path]) return;
@@ -367,18 +688,22 @@ const paletteList = $("palette-list");
 let paletteSel = 0;
 let paletteItems = [];
 
-const COMMANDS = [
-  { icon: "👤", label: "Open: about.ts (About me)", run: () => openFile("about.ts") },
-  { icon: "🧰", label: "Open: skills.json (Skills)", run: () => openFile("skills.json") },
-  { icon: "📦", label: "Open: projects/ (Projects)", run: () => openFile("projects/vscode-homepage.ts") },
-  { icon: "📮", label: "Open: contact.md (Contact)", run: () => openFile("contact.md") },
-  { icon: "📘", label: "Open: README.md (Guide)", run: () => openFile("README.md") },
-  { icon: "🌗", label: "Toggle light / dark theme", hint: "theme", run: toggleTheme },
-  { icon: "🖥️", label: "Toggle terminal", hint: "Ctrl + `", run: toggleTerminal },
-  { icon: "🗂️", label: "Toggle sidebar", run: toggleSidebar },
-  { icon: "🐙", label: "Open GitHub profile ↗", hint: PROFILE.github, run: () => window.open(PROFILE.github, "_blank") },
-  { icon: "💡", label: "Show usage tips", run: () => showToast("Click files in the explorer to switch content. ⌘K / Ctrl+K opens the command palette, Ctrl + ` opens the terminal.") },
-];
+function buildCommands() {
+  const m = T();
+  return [
+    { icon: "👤", label: m.cmdAbout, run: () => openFile("about.ts") },
+    { icon: "🧰", label: m.cmdSkills, run: () => openFile("skills.json") },
+    { icon: "📦", label: m.cmdProjects, run: () => openFile("projects/vscode-homepage.ts") },
+    { icon: "📮", label: m.cmdContact, run: () => openFile("contact.md") },
+    { icon: "📘", label: m.cmdReadme, run: () => openFile("README.md") },
+    { icon: "🖥️", label: m.cmdTerm, hint: "Ctrl + `", run: toggleTerminal },
+    { icon: "🗂️", label: m.cmdSidebar, run: toggleSidebar },
+    { icon: "🐙", label: m.cmdGithub, hint: PROFILE.github, run: () => window.open(PROFILE.github, "_blank") },
+    { icon: "💡", label: m.cmdTips, run: () => showToast(T().tipsText) },
+  ];
+}
+
+let COMMANDS = buildCommands();
 
 function openPalette() {
   paletteEl.classList.remove("hidden");
@@ -402,7 +727,7 @@ function updatePalette(q) {
 
 function renderPalette() {
   if (!paletteItems.length) {
-    paletteList.innerHTML = '<li class="none">No matching commands</li>';
+    paletteList.innerHTML = `<li class="none">${T().noMatch}</li>`;
     return;
   }
   paletteList.innerHTML = paletteItems
@@ -412,17 +737,150 @@ function renderPalette() {
         ${c.hint ? `<span class="p-hint">${c.hint}</span>` : ""}</li>`,
     )
     .join("");
-  paletteList.querySelectorAll("li[data-i]").forEach((el) => {
-    el.addEventListener("mouseenter", () => {
-      paletteSel = Number(el.dataset.i);
-      renderPalette();
-    });
-    el.addEventListener("click", () => {
-      closePalette();
-      paletteItems[Number(el.dataset.i)].run();
-    });
-  });
 }
+
+/* 事件委托：悬停只切换高亮（不重建 DOM，否则会吃掉点击）；点击执行 */
+paletteList.addEventListener("mouseover", (e) => {
+  const li = e.target.closest("li[data-i]");
+  if (!li || Number(li.dataset.i) === paletteSel) return;
+  paletteSel = Number(li.dataset.i);
+  paletteList.querySelectorAll("li.selected").forEach((x) => x.classList.remove("selected"));
+  li.classList.add("selected");
+});
+paletteList.addEventListener("click", (e) => {
+  const li = e.target.closest("li[data-i]");
+  if (!li || li.classList.contains("none")) return;
+  closePalette();
+  const item = paletteItems[Number(li.dataset.i)];
+  if (item) item.run();
+});
+
+/* ============ 4.5 Command Center（顶部搜索栏 + 快速打开） ============ */
+
+const qoEl = $("quick-open");
+const qoInput = $("qo-input");
+const qoList = $("qo-list");
+let qoSel = 0;
+let qoFiles = [];
+
+function isMacEnv() {
+  return /Mac|iPhone|iPad/.test(navigator.platform);
+}
+
+function openQuickOpen() {
+  qoEl.classList.remove("hidden");
+  $("command-center").classList.add("open");
+  qoInput.value = "";
+  qoSel = 0;
+  renderQo();
+  qoInput.focus();
+}
+
+function closeQuickOpen() {
+  qoEl.classList.add("hidden");
+  $("command-center").classList.remove("open");
+}
+
+function qoAct(act) {
+  const m = T();
+  if (act === "commands") {
+    closeQuickOpen();
+    openPalette();
+    return;
+  }
+  const toasts = {
+    search: m.qoToastSearch,
+    chat: m.qoToastChat,
+    symbol: m.qoToastSymbol,
+    debug: m.qoToastDebug,
+    task: m.qoToastTask,
+    more: m.qoToastMore,
+  };
+  if (toasts[act]) showToast(toasts[act]);
+}
+
+function renderQo() {
+  const m = T();
+  const q = qoInput.value.trim().toLowerCase();
+  const mod = isMacEnv() ? "⌘" : "Ctrl";
+  qoFiles = Object.keys(FILES).filter((p) => !q || basename(p).toLowerCase().includes(q));
+
+  const modes = [
+    { label: m.qoGoFile, keys: [mod, "P"], act: "focus" },
+    { label: m.qoRunCommands, keys: ["⇧", mod, "P"], act: "commands" },
+    { label: m.qoSearchText, hint: "%", act: "search" },
+    { label: m.qoChat, keys: ["⇧", isMacEnv() ? "⌥" : "Alt", mod, "L"], act: "chat" },
+    { label: m.qoSymbol, hint: "@", act: "symbol" },
+    { label: m.qoDebug, hint: "debug", act: "debug" },
+    { label: m.qoTask, hint: "task", act: "task" },
+    { label: m.qoMore, hint: "?", act: "more" },
+  ];
+
+  let html = modes
+    .map(
+      (mo, i) => `<div class="qo-row ${i === 0 && !q ? "selected" : ""}" data-act="${mo.act}">
+        <span>${mo.label}</span>
+        ${mo.hint ? `<span class="qo-hint">${mo.hint}</span>` : ""}
+        ${mo.keys ? `<span class="qo-keys">${mo.keys.map((k) => `<kbd class="qo-kbd">${k}</kbd>`).join("")}</span>` : ""}
+      </div>`,
+    )
+    .join("");
+  html += '<div class="qo-sep"></div>';
+  html += qoFiles
+    .map(
+      (p, i) => `<div class="qo-row qo-file-row ${i === qoSel ? "selected" : ""}" data-file="${p}">
+        ${fileIcon(p)} <span>${basename(p)}</span>
+        ${i === 0 ? `<span class="qo-hint">${m.qoRecent}</span>` : ""}
+      </div>`,
+    )
+    .join("");
+  qoList.innerHTML = html;
+}
+
+qoInput.addEventListener("input", renderQo);
+qoInput.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+    qoSel = Math.min(qoSel + 1, Math.max(qoFiles.length - 1, 0));
+    renderQo();
+    qoInput.focus();
+  } else if (e.key === "ArrowUp") {
+    e.preventDefault();
+    qoSel = Math.max(qoSel - 1, 0);
+    renderQo();
+    qoInput.focus();
+  } else if (e.key === "Enter") {
+    const f = qoFiles[qoSel];
+    if (f) {
+      openFile(f);
+      closeQuickOpen();
+    }
+  } else if (e.key === "Escape") {
+    closeQuickOpen();
+  }
+});
+qoList.addEventListener("click", (e) => {
+  const fileRow = e.target.closest(".qo-file-row");
+  if (fileRow) {
+    openFile(fileRow.dataset.file);
+    closeQuickOpen();
+    return;
+  }
+  const modeRow = e.target.closest(".qo-row[data-act]");
+  if (modeRow) qoAct(modeRow.dataset.act);
+});
+qoList.addEventListener("mouseover", (e) => {
+  const fileRow = e.target.closest(".qo-file-row");
+  if (!fileRow) return;
+  qoSel = qoFiles.indexOf(fileRow.dataset.file);
+  qoList.querySelectorAll(".qo-file-row.selected").forEach((x) => x.classList.remove("selected"));
+  fileRow.classList.add("selected");
+});
+$("command-center").addEventListener("click", openQuickOpen);
+document.addEventListener("click", (e) => {
+  if (qoEl.classList.contains("hidden")) return;
+  if (!qoEl.contains(e.target) && !e.target.closest("#command-center")) closeQuickOpen();
+});
 
 paletteInput.addEventListener("input", () => updatePalette(paletteInput.value));
 paletteInput.addEventListener("keydown", (e) => {
@@ -457,8 +915,8 @@ function toggleTerminal() {
   if (!terminalEl.classList.contains("hidden")) {
     if (!termBody.dataset.welcomed) {
       termBody.dataset.welcomed = "1";
-      termPrint("yang-syzng@homepage — bash (cosplay edition)", "t-banner");
-      termPrint("Type <b>help</b> for available commands. Try <b>neofetch</b> for a surprise.", "t-dim");
+      termPrint(T().termBanner, "t-banner");
+      termPrint(T().termBannerHint, "t-dim");
       termPrint("");
     }
     termInput.focus();
@@ -481,35 +939,24 @@ function runCommand(raw) {
   );
   if (!cmdline) return;
 
+  const m = T();
   const [cmd, ...args] = cmdline.split(/\s+/);
   switch (cmd) {
     case "help":
-      termPrint(
-        [
-          "Available commands:",
-          "  help        show this help",
-          "  whoami      who am I",
-          "  ls          list all files",
-          "  cat <file>  print a file (e.g. cat about.ts)",
-          "  neofetch    system info (pretend)",
-          "  github      open the GitHub profile",
-          "  theme       toggle light / dark theme",
-          "  echo / date / clear / sudo also work",
-        ].join("\n"),
-      );
+      termPrint(m.helpText.join("\n"));
       break;
     case "whoami":
-      termPrint("visitor — a friendly passerby of this homepage. Welcome 👋");
+      termPrint(m.whoami);
       break;
     case "ls":
       termPrint(esc(Object.keys(FILES).join("  ")));
       break;
     case "cat": {
       const f = args[0];
-      if (!f) termPrint("usage: cat <file> (run ls first)", "t-dim");
+      if (!f) termPrint(m.catUsage, "t-dim");
       else if (FILES[f])
         termPrint(esc(FILES[f].content).replaceAll("__VISITORS__", visitorsText()));
-      else termPrint(`cat: ${esc(f)}: No such file`, "t-err");
+      else termPrint(m.catMissing(f), "t-err");
       break;
     }
     case "neofetch":
@@ -519,19 +966,19 @@ function runCommand(raw) {
           "    ╚██╗ ██╔╝     -----------------",
           "     ╚████╔╝      <span class='t-dim'>OS:</span>      GitHub Pages",
           "      ╚██╔╝       <span class='t-dim'>Host:</span>    homepage",
-          "       ██║        <span class='t-dim'>Shell:</span>   cosplay bash 5.0",
-          "       ╚═╝        <span class='t-dim'>Theme:</span>   VS Code (currently " + document.documentElement.dataset.theme + ")",
-          "                  <span class='t-dim'>Mood:</span>    tinkering 🔧",
+          "       ██║        <span class='t-dim'>Shell:</span>   " + m.shellValue,
+          "       ╚═╝        <span class='t-dim'>Theme:</span>   " + m.themeNow(document.documentElement.dataset.theme),
+          "                  <span class='t-dim'>Mood:</span>    " + m.mood,
         ].join("\n"),
       );
       break;
     case "github":
-      termPrint("Opening the GitHub profile…", "t-ok");
+      termPrint(m.githubOpening, "t-ok");
       window.open(PROFILE.github, "_blank");
       break;
     case "theme":
       toggleTheme();
-      termPrint("Theme switched ✅", "t-ok");
+      termPrint(m.themeSwitched, "t-ok");
       break;
     case "echo":
       termPrint(esc(args.join(" ")));
@@ -540,13 +987,13 @@ function runCommand(raw) {
       termPrint(esc(new Date().toString()));
       break;
     case "sudo":
-      termPrint("visitor is not in the sudoers file. This incident will be reported. 😏", "t-err");
+      termPrint(m.sudo, "t-err");
       break;
     case "clear":
       termBody.innerHTML = "";
       break;
     default:
-      termPrint(`bash: ${esc(cmd)}: command not found (try <b>help</b>)`, "t-err");
+      termPrint(m.cmdNotFound(cmd), "t-err");
   }
 }
 
@@ -568,6 +1015,8 @@ function applyTheme(theme) {
   document.documentElement.dataset.theme = theme;
   localStorage.setItem("hp-theme", theme);
   $("status-theme").textContent = theme === "dark" ? "🌚" : "🌝";
+  $("menu-theme-icon").textContent = theme === "dark" ? "🌚" : "🌝";
+  $("menu-theme-state").textContent = theme === "dark" ? "Dark" : "Light";
 }
 
 function toggleTheme() {
@@ -586,16 +1035,78 @@ function showToast(html) {
   toastTimer = setTimeout(() => $("toast").classList.add("hidden"), 6000);
 }
 
-$("act-theme").addEventListener("click", toggleTheme);
-$("status-theme").addEventListener("click", toggleTheme);
+/* ---- 语言切换（设置菜单里） ---- */
+function applyLang(l, silent) {
+  lang = l;
+  localStorage.setItem("hp-lang", l);
+  FILES = l === "zh" ? FILES_ZH : FILES_EN;
+  const m = T();
+
+  // 静态文案
+  $("sb-title").textContent = m.explorer;
+  $("ol-title").textContent = m.outline;
+  $("palette-hint-label").textContent = m.paletteBtn;
+  $("palette-input").placeholder = m.palettePlaceholder;
+  $("pf-up").innerHTML = '<kbd>↑</kbd><kbd>↓</kbd> ' + m.navigate;
+  $("pf-run").innerHTML = '<kbd>↵</kbd> ' + m.run;
+  $("pf-esc").innerHTML = '<kbd>Esc</kbd> ' + m.close;
+  $("terminal-input").placeholder = m.termPlaceholder;
+  $("qo-input").placeholder = m.qoPlaceholder;
+  $("menu-theme-label").textContent = m.themeItem;
+  $("act-files").title = m.actFiles;
+  $("act-search").title = m.actSearch;
+  $("act-terminal").title = m.actTerminal;
+  $("act-settings").title = m.actSettings;
+  $("btn-palette-hint").title = m.openPalette;
+  $("status-theme").title = m.toggleTheme;
+  $("status-branch").title = m.branch;
+  $("status-remote").title = m.remote;
+  $("status-problems").title = m.noProblems;
+  $("status-bell").title = m.notifications;
+  $("terminal-hide").title = m.closeTerminal;
+  $("menu-lang-state").textContent = l === "zh" ? "中文" : "English";
+
+  // 动态部分重建
+  COMMANDS = buildCommands();
+  renderTree();
+  renderTabs();
+  renderEditor();
+  if (!paletteEl.classList.contains("hidden")) renderPalette();
+  if (!silent) showToast(m.toastLang);
+}
+
+/* 设置菜单（齿轮） */
+const settingsMenu = $("settings-menu");
+function closeSettingsMenu() {
+  settingsMenu.classList.add("hidden");
+}
+$("act-settings").addEventListener("click", () => {
+  settingsMenu.classList.toggle("hidden");
+});
+$("menu-theme").addEventListener("click", () => {
+  toggleTheme();
+  closeSettingsMenu();
+});
+$("menu-lang").addEventListener("click", () => {
+  applyLang(lang === "zh" ? "en" : "zh");
+  closeSettingsMenu();
+});
+document.addEventListener("click", (e) => {
+  if (
+    !settingsMenu.classList.contains("hidden") &&
+    !settingsMenu.contains(e.target) &&
+    !e.target.closest("#act-settings")
+  ) {
+    closeSettingsMenu();
+  }
+});
 $("act-files").addEventListener("click", toggleSidebar);
+$("status-theme").addEventListener("click", toggleTheme);
 $("act-search").addEventListener("click", openPalette);
 $("btn-palette-hint").addEventListener("click", openPalette);
 $("act-terminal").addEventListener("click", toggleTerminal);
 $("terminal-hide").addEventListener("click", toggleTerminal);
-$("status-branch").addEventListener("click", () =>
-  showToast("Branch main is protected: this is a homepage, not a PR 🛡️"),
-);
+$("status-branch").addEventListener("click", () => showToast(T().toastBranch));
 $("toast-close").addEventListener("click", () => $("toast").classList.add("hidden"));
 
 /* ============ 6.5 访问人次（静态页用免费计数服务 Abacus） ============ */
@@ -657,11 +1168,16 @@ document.addEventListener("keydown", (e) => {
   if (mod && e.key.toLowerCase() === "k") {
     e.preventDefault();
     paletteEl.classList.contains("hidden") ? openPalette() : closePalette();
+  } else if (mod && e.key.toLowerCase() === "p") {
+    e.preventDefault();
+    openQuickOpen();
   } else if (e.ctrlKey && e.code === "Backquote") {
     e.preventDefault();
     toggleTerminal();
   } else if (e.key === "Escape") {
     closePalette();
+    closeQuickOpen();
+    closeSettingsMenu();
   }
 });
 
@@ -670,17 +1186,11 @@ document.addEventListener("keydown", (e) => {
   if (!isMac) $("kbd-hint").textContent = "Ctrl+K";
 
   applyTheme(localStorage.getItem("hp-theme") || "dark");
-  renderTree();
-  renderTabs();
-  renderEditor();
+  applyLang(localStorage.getItem("hp-lang") || "en", true);
   loadVisitors();
 
   // 手机上默认收起侧栏
   if (window.innerWidth <= 860) $("sidebar").classList.add("closed");
 
-  setTimeout(() => {
-    showToast(
-      "👋 Welcome to my homepage!<br>Press <b>⌘K / Ctrl+K</b> for the command palette, or <b>Ctrl + `</b> for the terminal.",
-    );
-  }, 700);
+  setTimeout(() => showToast(T().toastWelcome), 700);
 })();
