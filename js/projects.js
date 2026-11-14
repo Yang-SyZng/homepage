@@ -8,7 +8,7 @@ import { state } from "./state.js";
 import { PROFILE, TREE } from "./content.js";
 import { fetchT } from "./util.js";
 import { nextLanguage, pickExt, langOfExt, famOfExt, classNameOf, snakeOf } from "./langs.js";
-import { renderTree, renderTabs, renderEditor } from "./editor.js";
+import { renderTree, renderTabs, renderEditor, updateNavArrows } from "./editor.js";
 
 export const PROJECT_FILES = {};
 
@@ -209,10 +209,14 @@ function useProjects(list) {
 
   Object.assign(state.files, PROJECT_FILES);
   state.openTabs = state.openTabs.filter((p) => state.files[p]);
+  // 导航历史里的旧路径可能已失效（重新抓取后扩展名重排），同步修剪
+  state.navStack = state.navStack.filter((p) => state.files[p]);
+  state.navIndex = Math.min(state.navIndex, state.navStack.length - 1);
   if (!state.files[state.activeFile]) state.activeFile = state.openTabs.find((f) => state.files[f]) || "README.md";
   renderTree();
   renderTabs();
   renderEditor();
+  updateNavArrows();
 }
 
 export async function fetchProjects() {

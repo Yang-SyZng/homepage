@@ -149,23 +149,57 @@ export function renderEditor() {
   updatePreviewPane();
 }
 
-export function openFile(path) {
+/* 激活文件；push=true 时把切换记录进导航历史（标题栏前进 / 后退用） */
+function activate(path, { push = true } = {}) {
   if (!state.files[path]) return;
   if (!state.openTabs.includes(path)) state.openTabs.push(path);
   state.activeFile = path;
+  if (push && state.navStack[state.navIndex] !== path) {
+    state.navStack = state.navStack.slice(0, state.navIndex + 1); // 走过历史后重新分支，丢弃"前进"残段
+    state.navStack.push(path);
+    state.navIndex = state.navStack.length - 1;
+  }
   renderTree();
   renderTabs();
   renderEditor();
+  updateNavArrows();
 }
+
+export function openFile(path) {
+  activate(path);
+}
+
+/* 后退 / 前进：沿导航历史移动指针，不重复入栈（同 VS Code go back/forward） */
+function navigate(direction) {
+  const next = state.navIndex + direction;
+  const path = state.navStack[next];
+  if (path === undefined || !state.files[path]) return;
+  state.navIndex = next;
+  activate(path, { push: false });
+}
+export const navigateBack = () => navigate(-1);
+export const navigateForward = () => navigate(1);
+
+export function updateNavArrows() {
+  const back = $("nav-back");
+  const forward = $("nav-forward");
+  if (!back || !forward) return;
+  back.disabled = state.navIndex <= 0;
+  forward.disabled = state.navIndex >= state.navStack.length - 1;
+}
+
+$("nav-back").addEventListener("click", navigateBack);
+$("nav-forward").addEventListener("click", navigateForward);
 
 /* ---- 小地图：真实微缩代码渲染（同 VS Code minimap），随编辑器滚动联动 ---- */
 
 const editorAreaEl = editorEl.parentElement;
 
-function updateMinimapSlider() {
+export function updateMinimapSlider() {
   const slider = document.getElementById("mm-slider");
   const content = minimapEl.querySelector(".mm-content");
   if (!slider || !content) return;
+  syncMinimapWrap();
   const viewRatio = Math.min(
     1,
     editorAreaEl.clientHeight / Math.max(editorAreaEl.scrollHeight, 1),
@@ -185,6 +219,25 @@ function renderMinimap(lines) {
   minimapEl.innerHTML =
     `<div class="mm-content">${body}</div><div class="mm-slider" id="mm-slider"></div>`;
   updateMinimapSlider();
+}
+
+/* 小地图镜像编辑器的折行状态（vscode minimap 渲染的就是折行后的可视行）：
+   编辑器里哪一行折了，对应 .mm-line 才允许折行；折行宽度 = .lc 可用宽度 ×
+   字号比例。不按字符比例硬算——CJK 回退字体在 3.2px 下的步进与编辑器不一致 */
+function syncMinimapWrap() {
+  const content = minimapEl.querySelector(".mm-content");
+  if (!content) return;
+  const rows = editorEl.querySelectorAll(".code-line");
+  const mmLines = content.querySelectorAll(".mm-line");
+  let avail = 0;
+  rows.forEach((row, i) => {
+    const wrapped = row.getBoundingClientRect().height > 28; // 单行 ≈ 13.5 × 1.7 ≈ 23px
+    const mm = mmLines[i];
+    if (mm) mm.classList.toggle("wrapped", wrapped);
+    const lc = row.querySelector(".lc");
+    if (lc) avail = Math.max(avail, lc.getBoundingClientRect().width);
+  });
+  if (avail > 0) content.style.width = (avail * 3.2) / 13.5 + "px";
 }
 
 editorAreaEl.addEventListener("scroll", updateMinimapSlider);

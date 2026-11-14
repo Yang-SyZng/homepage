@@ -1,0 +1,35 @@
+/* ============ Sash（分隔条，对齐 vscode src/vs/base/browser/ui/sash/sash.css） ============ */
+.sash {
+  position: absolute;
+  z-index: 35;
+  touch-action: none;
+  top: 0;
+  bottom: 4px; /* 让出 workbench 的下内边距 */
+  width: 4px; /* sash.ts: globalSize = 4 */
+}
+.sash.vertical { cursor: ew-resize; }
+.sash.vertical.mac { cursor: col-resize; } /* mac 上 vscode 用 col-resize */
+.sash.vertical.minimum { cursor: e-resize; } /* 已到最小宽度：只能再拉大 */
+.sash.vertical.maximum { cursor: w-resize; } /* 已到最大宽度：只能再缩小 */
+
+.sash::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+/* vscode 仅在允许动画时给高亮条过渡：background-color 0.1s ease-out */
+@media (prefers-reduced-motion: no-preference) {
+  .sash::before { transition: background-color 0.1s ease-out; }
+}
+/* sash.hoverBorder 默认取 focusBorder：Dark #0078D4 / Light #005FB8 = --accent */
+.sash.hover::before,
+.sash.active::before {
+  background: var(--accent);
+}
+
+@media (max-width: 860px) {
+  .sash { display: none; } /* 移动端侧栏是浮层，不参与拖拽 */
+}

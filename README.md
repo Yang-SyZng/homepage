@@ -27,6 +27,7 @@ js/
   terminal.js   fake terminal
   visitors.js   Abacus visitor counter
   ui.js         theme, sidebar, toasts
+  sash.js       draggable sidebar sash (per VS Code sash.ts)
   util.js       small shared helpers
 style/          one stylesheet per component, mirrors js/
   base.css      variables, dark / light themes, reset, window shell
@@ -36,6 +37,7 @@ style/          one stylesheet per component, mirrors js/
   editor.css    tabs, code area, minimap, editor groups, preview
   terminal.css  fake terminal
   statusbar.css status bar
+  sash.css      draggable separator between sidebar and editor
   palette.css   command palette
   toast.css     notification toast
   responsive.css small-screen adjustments

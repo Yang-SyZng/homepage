@@ -50,6 +50,28 @@
 .cc-right { margin-left: auto; display: flex; align-items: center; gap: 7px; opacity: 0.8; }
 .cc-right svg { width: 14px; height: 14px; }
 
+/* ---- 前进 / 后退（同 VS Code 标题栏导航箭头） ---- */
+.titlebar-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: none;
+  margin-right: 8px;
+}
+.nav-arrow {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 5px;
+  color: var(--text);
+  opacity: 0.85;
+  transition: background 0.12s, opacity 0.12s;
+}
+.nav-arrow svg { width: 16px; height: 16px; display: block; }
+.nav-arrow:hover:not(:disabled) { background: var(--bg-hover); opacity: 1; }
+.nav-arrow:disabled { opacity: 0.35; cursor: default; }
+
 /* ---- 快速打开面板 ---- */
 .quick-open {
   position: absolute;
@@ -100,20 +122,3 @@
 }
 .qo-hint { margin-left: auto; color: var(--text-faint); font-size: 12px; flex: none; }
 .qo-sep { border-top: 1px solid var(--border); margin: 5px 0; }
-
-.palette-hint {
-  flex: none;
-  font-size: 11.5px;
-  color: var(--text-dim);
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
-  padding: 3px 10px;
-  background: var(--bg-hover);
-  transition: all 0.15s;
-}
-.palette-hint:hover { color: var(--text); border-color: var(--text-faint); }
-.palette-hint kbd {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  margin-right: 3px;
-}

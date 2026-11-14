@@ -108,12 +108,15 @@
 .breadcrumb .bc-file { color: var(--text-strong); }
 
 /* ---- 代码区 ---- */
+/* 自动换行（同 vscode editor.wordWrap: "on"）：换行点 = 内容区宽度（不含
+   minimap），编辑器变窄时长行折行而不是横向滚到小地图底下；wrappingIndent
+   默认 'same'，flex 行内 .lc 自身折行即为续行同缩进 */
 .editor-area {
   flex: 1;
   min-height: 0;
   position: relative;
   overflow-y: auto;
-  overflow-x: auto;
+  overflow-x: hidden;
   background: var(--bg);
   scrollbar-width: thin;
   scrollbar-color: var(--text-faint) transparent;
@@ -132,13 +135,11 @@
   font-size: 13.5px;
   line-height: 1.7;
   padding: 8px 0 40vh;
-  min-width: fit-content;
 }
 
 .code-line {
   display: flex;
-  min-width: fit-content;
-  padding-right: 90px;
+  padding-right: 74px; /* 64 minimap + 10 间隙：文本不钻到小地图底下 */
   opacity: 0;
   transform: translateY(4px);
   animation: line-in 0.22s ease forwards;
@@ -155,7 +156,7 @@
 .code-line.active-line::after {
   content: "";
   position: absolute;
-  left: 4px; right: 86px; top: 0; bottom: 0;
+  left: 4px; right: 70px; top: 0; bottom: 0;
   background: var(--bg-line-active);
   border-radius: var(--r-sm);
   pointer-events: none;
@@ -170,7 +171,11 @@
   color: var(--text-faint);
   user-select: none;
 }
-.lc { white-space: pre; }
+.lc {
+  min-width: 0; /* 允许 flex 子项收缩触发折行 */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere; /* 优先词边界，放不下再任意断（同 vscode wordBreak: normal） */
+}
 
 .cursor {
   display: inline-block;
@@ -299,7 +304,15 @@
   white-space: pre;
   pointer-events: none;
 }
-.mm-line { color: var(--syn-plain); }
+.mm-line {
+  color: var(--syn-plain);
+  white-space: pre; /* 默认不折行，超宽裁剪（同 vscode） */
+}
+.mm-line.wrapped {
+  /* 编辑器里折行的行，小地图同步折行（js/editor.js syncMinimapWrap 控制） */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
 .mm-slider {
   position: absolute;
   left: 0;

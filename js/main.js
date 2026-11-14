@@ -6,7 +6,7 @@
 import { state } from "./state.js";
 import { T } from "./i18n.js";
 import { FILES_EN, FILES_ZH } from "./content.js";
-import { $, isMac } from "./util.js";
+import { $ } from "./util.js";
 import { applyTheme, toggleTheme, toggleSidebar, showToast } from "./ui.js";
 import { renderTree, renderTabs, renderEditor, toggleMdPreview } from "./editor.js";
 import { PROJECT_FILES, fetchProjects } from "./projects.js";
@@ -14,6 +14,7 @@ import { refreshCommands, openPalette, closePalette, togglePalette } from "./pal
 import { openQuickOpen, closeQuickOpen } from "./quickopen.js";
 import { toggleTerminal } from "./terminal.js";
 import { loadVisitors } from "./visitors.js";
+import "./sash.js";
 
 /* ---- 语言切换（设置菜单里）：换文案、换文件内容并整体重渲染 ---- */
 function applyLang(l, silent) {
@@ -26,7 +27,6 @@ function applyLang(l, silent) {
   // 静态文案
   $("sb-title").textContent = m.explorer;
   $("ol-title").textContent = m.outline;
-  $("palette-hint-label").textContent = m.paletteBtn;
   $("palette-input").placeholder = m.palettePlaceholder;
   $("pf-up").innerHTML = '<kbd>↑</kbd><kbd>↓</kbd> ' + m.navigate;
   $("pf-run").innerHTML = '<kbd>↵</kbd> ' + m.run;
@@ -38,7 +38,8 @@ function applyLang(l, silent) {
   $("act-search").title = m.actSearch;
   $("act-terminal").title = m.actTerminal;
   $("act-settings").title = m.actSettings;
-  $("btn-palette-hint").title = m.openPalette;
+  $("nav-back").title = m.navBack;
+  $("nav-forward").title = m.navForward;
   $("status-theme").title = m.toggleTheme;
   $("status-branch").title = m.branch;
   $("status-remote").title = m.remote;
@@ -86,7 +87,6 @@ document.addEventListener("click", (e) => {
 $("act-files").addEventListener("click", toggleSidebar);
 $("status-theme").addEventListener("click", toggleTheme);
 $("act-search").addEventListener("click", openPalette);
-$("btn-palette-hint").addEventListener("click", openPalette);
 $("act-terminal").addEventListener("click", toggleTerminal);
 $("terminal-hide").addEventListener("click", toggleTerminal);
 $("status-branch").addEventListener("click", () => showToast(T().toastBranch));
@@ -113,8 +113,6 @@ document.addEventListener("keydown", (e) => {
 });
 
 (function init() {
-  if (!isMac()) $("kbd-hint").textContent = "Ctrl+K";
-
   applyTheme(localStorage.getItem("hp-theme") || "dark");
   applyLang(localStorage.getItem("hp-lang") || "en", true);
   loadVisitors();
